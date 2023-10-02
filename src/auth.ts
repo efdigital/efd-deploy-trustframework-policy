@@ -9,7 +9,7 @@ export class ClientCredentialsAuthProvider implements AuthenticationProvider {
     tenant: string,
     private clientId: string,
     private clientSecret: string,
-    private scope: string,
+    private scopes: string[],
   ) {
     this.authClient = Issuer.discover(
       `https://login.microsoftonline.com/${tenant}/v2.0/.well-known/openid-configuration`
@@ -39,7 +39,7 @@ export class ClientCredentialsAuthProvider implements AuthenticationProvider {
       grant_type: "client_credentials",
       client_id: this.clientId,
       client_secret: this.clientSecret,
-      scope: this.scope,
+      scope: this.scopes.join(' '),
     })
   }
 }
