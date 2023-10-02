@@ -25,7 +25,7 @@ class Settings {
   tenant = ''
   clientId = ''
   clientSecret = ''
-  scope = 'https://graph.microsoft.com/.default'
+  region = 'eu'
   addAppInsightsStep = false
   renumberSteps = false
   verbose = false
@@ -40,7 +40,7 @@ async function run(): Promise<void> {
     settings.tenant = core.getInput('tenant')
     settings.clientId = core.getInput('clientId')
     settings.clientSecret = core.getInput('clientSecret')
-    settings.scope = core.getInput('scope')
+    settings.region = core.getInput('region')
     settings.addAppInsightsStep = core.getInput('addAppInsightsStep')  === true || core.getInput('addAppInsightsStep') === 'true'
     settings.renumberSteps = core.getInput('renumberSteps')  === true || core.getInput('renumberSteps') === 'true'
     settings.verbose = core.getInput('verbose')  === true || core.getInput('verbose') === 'true'
@@ -78,13 +78,16 @@ async function run(): Promise<void> {
     if (settings.verbose)
       core.info(JSON.stringify(settings))
 
+    const baseUrl = settings.region === "cn" ? 'https://microsoftgraph.chinacloudapi.cn': "https://graph.microsoft.com"
+
     // Create OAuth2 client
     const client = Client.initWithMiddleware({
+      baseUrl,
       authProvider: new ClientCredentialsAuthProvider(
         settings.tenant,
         settings.clientId,
         settings.clientSecret,
-        settings.scope
+        [`${baseUrl}/.default`] 
       ),
       defaultVersion: 'beta'
     })

@@ -19,10 +19,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientCredentialsAuthProvider = void 0;
 const openid_client_1 = __nccwpck_require__(3140);
 class ClientCredentialsAuthProvider {
-    constructor(tenant, clientId, clientSecret, scope) {
+    constructor(tenant, clientId, clientSecret, scopes) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
-        this.scope = scope;
+        this.scopes = scopes;
         this.cachedToken = null;
         this.authClient = openid_client_1.Issuer.discover(`https://login.microsoftonline.com/${tenant}/v2.0/.well-known/openid-configuration`).then((issuer) => {
             const client = new issuer.Client({
@@ -50,7 +50,7 @@ class ClientCredentialsAuthProvider {
                 grant_type: "client_credentials",
                 client_id: this.clientId,
                 client_secret: this.clientSecret,
-                scope: this.scope,
+                scope: this.scopes.join(' '),
             });
         });
     }
@@ -100,7 +100,7 @@ class Settings {
         this.tenant = '';
         this.clientId = '';
         this.clientSecret = '';
-        this.scope = 'https://graph.microsoft.com/.default';
+        this.region = 'eu';
         this.addAppInsightsStep = false;
         this.renumberSteps = false;
         this.verbose = false;
@@ -116,7 +116,7 @@ function run() {
             settings.tenant = core.getInput('tenant');
             settings.clientId = core.getInput('clientId');
             settings.clientSecret = core.getInput('clientSecret');
-            settings.scope = core.getInput('scope');
+            settings.region = core.getInput('region');
             settings.addAppInsightsStep = core.getInput('addAppInsightsStep') === true || core.getInput('addAppInsightsStep') === 'true';
             settings.renumberSteps = core.getInput('renumberSteps') === true || core.getInput('renumberSteps') === 'true';
             settings.verbose = core.getInput('verbose') === true || core.getInput('verbose') === 'true';
@@ -144,9 +144,11 @@ function run() {
             // Print the input parameters
             if (settings.verbose)
                 core.info(JSON.stringify(settings));
+            const baseUrl = settings.region === "cn" ? 'https://microsoftgraph.chinacloudapi.cn' : "https://graph.microsoft.com";
             // Create OAuth2 client
             const client = microsoft_graph_client_1.Client.initWithMiddleware({
-                authProvider: new auth_1.ClientCredentialsAuthProvider(settings.tenant, settings.clientId, settings.clientSecret, settings.scope),
+                baseUrl,
+                authProvider: new auth_1.ClientCredentialsAuthProvider(settings.tenant, settings.clientId, settings.clientSecret, [`${baseUrl}/.default`]),
                 defaultVersion: 'beta'
             });
             // Create an array of policy files
