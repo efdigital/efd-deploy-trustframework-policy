@@ -4,13 +4,15 @@ import { AuthenticationProvider } from "@microsoft/microsoft-graph-client"
 export class ClientCredentialsAuthProvider implements AuthenticationProvider {
   private authClient: Promise<Client>
   private cachedToken: TokenSet | null = null
+  private scopes: string[] = []
 
   constructor(
     tenant: string,
     private clientId: string,
     private clientSecret: string,
-    private scopes: string[]
+    private scope: string
   ) {
+    this.scopes = [this.scope]
     this.authClient = Issuer.discover(
       `https://login.microsoftonline.com/${tenant}/v2.0/.well-known/openid-configuration`
     ).then((issuer) => {
