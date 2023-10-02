@@ -25,7 +25,7 @@ class Settings {
   tenant = ''
   clientId = ''
   clientSecret = ''
-  scopes = ['https://graph.microsoft.com/.default']
+  scope = 'https://graph.microsoft.com/.default'
   addAppInsightsStep = false
   renumberSteps = false
   verbose = false
@@ -40,7 +40,7 @@ async function run(): Promise<void> {
     settings.tenant = core.getInput('tenant')
     settings.clientId = core.getInput('clientId')
     settings.clientSecret = core.getInput('clientSecret')
-    settings.scopes = core.getInput('scope')
+    settings.scope = core.getInput('scope')
     settings.addAppInsightsStep = core.getInput('addAppInsightsStep')  === true || core.getInput('addAppInsightsStep') === 'true'
     settings.renumberSteps = core.getInput('renumberSteps')  === true || core.getInput('renumberSteps') === 'true'
     settings.verbose = core.getInput('verbose')  === true || core.getInput('verbose') === 'true'
@@ -84,7 +84,7 @@ async function run(): Promise<void> {
         settings.tenant,
         settings.clientId,
         settings.clientSecret,
-        settings.scopes
+        settings.scope
       ),
       defaultVersion: 'beta'
     })
