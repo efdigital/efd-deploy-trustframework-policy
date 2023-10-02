@@ -19,10 +19,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientCredentialsAuthProvider = void 0;
 const openid_client_1 = __nccwpck_require__(3140);
 class ClientCredentialsAuthProvider {
-    constructor(tenant, clientId, clientSecret, scopes) {
+    constructor(tenant, clientId, clientSecret, scope) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
-        this.scopes = scopes;
+        this.scope = scope;
         this.cachedToken = null;
         this.authClient = openid_client_1.Issuer.discover(`https://login.microsoftonline.com/${tenant}/v2.0/.well-known/openid-configuration`).then((issuer) => {
             const client = new issuer.Client({
@@ -50,7 +50,7 @@ class ClientCredentialsAuthProvider {
                 grant_type: "client_credentials",
                 client_id: this.clientId,
                 client_secret: this.clientSecret,
-                scope: this.scopes.join(" "),
+                scope: this.scope,
             });
         });
     }
@@ -100,7 +100,7 @@ class Settings {
         this.tenant = '';
         this.clientId = '';
         this.clientSecret = '';
-        this.scopes = ['https://graph.microsoft.com/.default'];
+        this.scope = 'https://graph.microsoft.com/.default';
         this.addAppInsightsStep = false;
         this.renumberSteps = false;
         this.verbose = false;
@@ -116,7 +116,7 @@ function run() {
             settings.tenant = core.getInput('tenant');
             settings.clientId = core.getInput('clientId');
             settings.clientSecret = core.getInput('clientSecret');
-            settings.scopes = core.getInput('scope');
+            settings.scope = core.getInput('scope');
             settings.addAppInsightsStep = core.getInput('addAppInsightsStep') === true || core.getInput('addAppInsightsStep') === 'true';
             settings.renumberSteps = core.getInput('renumberSteps') === true || core.getInput('renumberSteps') === 'true';
             settings.verbose = core.getInput('verbose') === true || core.getInput('verbose') === 'true';
@@ -146,7 +146,7 @@ function run() {
                 core.info(JSON.stringify(settings));
             // Create OAuth2 client
             const client = microsoft_graph_client_1.Client.initWithMiddleware({
-                authProvider: new auth_1.ClientCredentialsAuthProvider(settings.tenant, settings.clientId, settings.clientSecret, settings.scopes),
+                authProvider: new auth_1.ClientCredentialsAuthProvider(settings.tenant, settings.clientId, settings.clientSecret, settings.scope),
                 defaultVersion: 'beta'
             });
             // Create an array of policy files
